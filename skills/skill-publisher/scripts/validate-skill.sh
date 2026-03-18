@@ -95,7 +95,7 @@ else
 fi
 
 # 8. Structure check
-ALLOWED="SKILL.md scripts references assets package.json"
+ALLOWED="SKILL.md scripts references assets templates package.json"
 for item in "$SKILL_PATH"/*; do
   [ -e "$item" ] || continue
   base=$(basename "$item")
