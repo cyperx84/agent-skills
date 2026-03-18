@@ -123,7 +123,7 @@ jobs:
           while IFS= read -r skill; do
             [ -z "$skill" ] && continue
             name=$(basename "$skill")
-            extra=$(ls "$skill" | grep -v -E '^(SKILL\.md|scripts|references|assets|package\.json)$')
+            extra=$(ls "$skill" | grep -v -E '^(SKILL\.md|scripts|references|assets|package\.json)$' || true)
             if [ -n "$extra" ]; then
               echo "::warning::$name: unexpected files: $extra"
             fi
