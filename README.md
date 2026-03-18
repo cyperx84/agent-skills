@@ -6,10 +6,42 @@ Works with any [AgentSkills](https://agentskills.io) compatible agent: Claude Co
 
 ## Skills
 
-| Skill | Description | Install |
-|-------|-------------|---------|
-| [deep-research](skills/deep-research/) | Recursive breadth/depth research with parallel sub-agents | `npx skills add cyperx84/agent-skills/deep-research` |
-| [skill-publisher](skills/skill-publisher/) | Meta-skill: validate, publish, and distribute skills | `npx skills add cyperx84/agent-skills/skill-publisher` |
+### Core
+
+| Skill | Description |
+|-------|-------------|
+| [skill-publisher](skills/skill-publisher/) | Meta-skill: validate, publish, and distribute skills |
+| [deep-research](skills/deep-research/) | Recursive breadth/depth research with parallel sub-agents |
+| [clwatch](skills/clwatch/) | Detect coding tool updates and merge changelog deltas at session start |
+| [research-spinoff](skills/research-spinoff/) | Research spin-off product ideas from an existing project |
+| [multiplan](skills/multiplan/) | 4-model parallel planning workflow (Claude, Gemini, Codex, GLM-5) |
+| [content-breakdown](skills/content-breakdown/) | Turn articles, videos, and docs into structured findings and notes |
+| [clawforge](skills/clawforge/) | Agent swarm workflow — spawn, monitor, review, and manage coding agents |
+
+### Productivity
+
+| Skill | Description |
+|-------|-------------|
+| [lattice](skills/lattice/) | Mental models and cognitive frameworks for decisions and analysis |
+| [cyperx-voice](skills/cyperx-voice/) | Write in CyperX's exact voice — direct, casual, internet-native |
+| [imagegen](skills/imagegen/) | Generate and edit images from text prompts (Google Gemini) |
+| [ai-compat](skills/ai-compat/) | Search and compare AI model + harness compatibility pairings |
+| [instagram](skills/instagram/) | Control Instagram — browse feed, DMs, stories, post content |
+
+### Dotfiles (10 skills)
+
+| Skill | Description |
+|-------|-------------|
+| [pre-commit-guardian](skills/dotfiles/pre-commit-guardian/) | Validate config files before git commits |
+| [stow-health-manager](skills/dotfiles/stow-health-manager/) | Monitor GNU Stow symlink health |
+| [service-orchestrator](skills/dotfiles/service-orchestrator/) | Manage dotfile-dependent services (restart, reload, validate) |
+| [theme-switcher](skills/dotfiles/theme-switcher/) | Switch between dotfile themes (Alacritty, Ghostty, tmux, nvim) |
+| [sketchybar-plugin-dev](skills/dotfiles/sketchybar-plugin-dev/) | Scaffold and develop SketchyBar plugins |
+| [api-doc-generator](skills/dotfiles/api-doc-generator/) | Generate API documentation from source |
+| [db-migration-assistant](skills/dotfiles/db-migration-assistant/) | Generate and run database migrations |
+| [dependency-update-manager](skills/dotfiles/dependency-update-manager/) | Check and update project dependencies |
+| [environment-setup-validator](skills/dotfiles/environment-setup-validator/) | Validate dev environment setup |
+| [test-coverage-analyzer](skills/dotfiles/test-coverage-analyzer/) | Analyze and improve test coverage |
 
 ## Install a Skill
 
