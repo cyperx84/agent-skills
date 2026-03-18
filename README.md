@@ -42,23 +42,14 @@ clawhub install <skill-name>
 
 Each skill has a `SKILL.md` with trigger phrases and instructions. Your agent loads it automatically when the trigger matches.
 
-## Publish a Skill
+## Add a Skill
 
 ```bash
-# 1. Validate
+# 1. Validate it meets the spec
 bash skills/skill-publisher/scripts/validate-skill.sh path/to/your-skill
 
-# 2. Push to mono-repo
-bash skills/skill-publisher/scripts/github-push.sh path/to/your-skill
-
-# 3. Publish to ClawHub
-bash skills/skill-publisher/scripts/clawhub-publish.sh path/to/your-skill
-
-# 4. Generate PRs for awesome-lists
-bash skills/skill-publisher/scripts/generate-prs.sh your-skill-name
-
-# 5. Generate social posts
-bash skills/skill-publisher/scripts/generate-social.sh your-skill-name
+# 2. Add to mono-repo and push
+git add skills/your-skill && git commit -m "Add your-skill" && git push
 ```
 
 ## Skill Standard
