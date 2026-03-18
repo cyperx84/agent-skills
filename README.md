@@ -14,6 +14,7 @@ Works with any [AgentSkills](https://agentskills.io) compatible agent: Claude Co
 | [deep-research](skills/deep-research/) | Recursive breadth/depth research with parallel sub-agents |
 | [clwatch](skills/clwatch/) | Detect coding tool updates and merge changelog deltas at session start |
 | [research-spinoff](skills/research-spinoff/) | Research spin-off product ideas from an existing project |
+| [research-flywheel](skills/research-flywheel/) | Mine conversations for research topics, deep research them, and produce digests |
 | [multiplan](skills/multiplan/) | 4-model parallel planning workflow (Claude, Gemini, Codex, GLM-5) |
 | [content-breakdown](skills/content-breakdown/) | Turn articles, videos, and docs into structured findings and notes |
 | [clawforge](skills/clawforge/) | Agent swarm workflow — spawn, monitor, review, and manage coding agents |
