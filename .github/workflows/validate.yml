@@ -17,7 +17,9 @@ jobs:
       - name: Find skills
         id: find
         run: |
-          SKILLS=$(find skills -maxdepth 1 -mindepth 1 -type d | sort)
+          # Find all skill directories at depth 1 and depth 2 (for collections like dotfiles/)
+          # Only include dirs that contain SKILL.md
+          SKILLS=$(find skills -mindepth 2 -name SKILL.md | sed 's|/SKILL.md||' | sort)
           if [ -z "$SKILLS" ]; then
             echo "No skills found"
             exit 0
