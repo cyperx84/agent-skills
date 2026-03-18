@@ -21,113 +21,112 @@ jobs:
             echo "No skills found"
             exit 0
           fi
-          echo "skills=$SKILLS" >> "$GITHUB_OUTPUT"
-          echo "count=$(echo "$SKILLS" | wc -l | tr -d ' ')" >> "$GITHUB_OUTPUT"
+          COUNT=$(echo "$SKILLS" | wc -l | tr -d ' ')
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "skills<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$SKILLS" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Check SKILL.md exists
         run: |
-          for skill in ${{ steps.find.outputs.skills }}; do
+          while IFS= read -r skill; do
+            [ -z "$skill" ] && continue
             name=$(basename "$skill")
             if [ ! -f "$skill/SKILL.md" ]; then
               echo "::error::$name: missing SKILL.md"
               exit 1
             fi
             echo "✅ $name: SKILL.md found"
-          done
+          done <<< "${{ steps.find.outputs.skills }}"
 
       - name: Validate SKILL.md frontmatter
         run: |
-          for skill in ${{ steps.find.outputs.skills }}; do
+          while IFS= read -r skill; do
+            [ -z "$skill" ] && continue
             name=$(basename "$skill")
             skill_file="$skill/SKILL.md"
 
-            # Check YAML frontmatter delimiters
             if ! head -1 "$skill_file" | grep -q '^---'; then
               echo "::error::$name: SKILL.md must start with YAML frontmatter (---)"
               exit 1
             fi
 
-            # Extract frontmatter block
-            fm=$(sed -n '2,/^---$/p' "$skill_file" | head -n -1)
+            # Extract frontmatter (between first two --- lines)
+            fm=$(awk '/^---/{n++; next} n==1' "$skill_file")
             if [ -z "$fm" ]; then
               echo "::error::$name: SKILL.md frontmatter is empty"
               exit 1
             fi
 
-            # Required: name field
             if ! echo "$fm" | grep -q '^name:'; then
-              echo "::error::$name: SKILL.md frontmatter missing 'name' field"
+              echo "::error::$name: frontmatter missing 'name' field"
               exit 1
             fi
 
-            # Required: description field
             if ! echo "$fm" | grep -q '^description:'; then
-              echo "::error::$name: SKILL.md frontmatter missing 'description' field"
+              echo "::error::$name: frontmatter missing 'description' field"
               exit 1
             fi
 
-            # Validate name format: lowercase, hyphens, alphanumeric only
             skill_name=$(echo "$fm" | grep '^name:' | sed 's/name: *//' | tr -d '"' | tr -d "'")
             if ! echo "$skill_name" | grep -qE '^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$'; then
-              echo "::error::$name: name '$skill_name' must be lowercase, hyphens only, no leading/trailing hyphens"
+              echo "::error::$name: name '$skill_name' must be lowercase, hyphens only"
               exit 1
             fi
 
-            # Name must match directory name
             if [ "$skill_name" != "$name" ]; then
-              echo "::error::$name: SKILL.md name '$skill_name' must match directory name '$name'"
+              echo "::error::$name: name '$skill_name' must match directory name '$name'"
               exit 1
             fi
 
-            # Check SKILL.md line count
             lines=$(wc -l < "$skill_file" | tr -d ' ')
             if [ "$lines" -gt 500 ]; then
-              echo "::warning::$name: SKILL.md is $lines lines (recommended max: 500)"
+              echo "::warning::$name: SKILL.md is $lines lines (max 500)"
             fi
 
             echo "✅ $name: frontmatter valid ($lines lines)"
-          done
+          done <<< "${{ steps.find.outputs.skills }}"
 
       - name: Check for symlinks
         run: |
-          for skill in ${{ steps.find.outputs.skills }}; do
+          while IFS= read -r skill; do
+            [ -z "$skill" ] && continue
             name=$(basename "$skill")
             symlinks=$(find "$skill" -type l)
             if [ -n "$symlinks" ]; then
-              echo "::error::$name: contains symlinks (not allowed)"
+              echo "::error::$name: contains symlinks"
               echo "$symlinks"
               exit 1
             fi
             echo "✅ $name: no symlinks"
-          done
+          done <<< "${{ steps.find.outputs.skills }}"
 
       - name: Check scripts are executable
         run: |
-          for skill in ${{ steps.find.outputs.skills }}; do
+          while IFS= read -r skill; do
+            [ -z "$skill" ] && continue
             name=$(basename "$skill")
             if [ -d "$skill/scripts" ]; then
               for script in "$skill/scripts"/*; do
-                if [ -f "$script" ] && ! file "$script" | grep -q "script"; then
-                  continue
-                fi
-                if [ -f "$script" ] && file "$script" | grep -q "script" && [ ! -x "$script" ]; then
-                  echo "::warning::$name: $(basename $script) is not executable"
+                [ -f "$script" ] || continue
+                if file "$script" | grep -q "script" && [ ! -x "$script" ]; then
+                  echo "::warning::$name: $(basename "$script") not executable"
                 fi
               done
             fi
-          done
+          done <<< "${{ steps.find.outputs.skills }}"
           echo "✅ Script permissions checked"
 
-      - name: Check for no extra top-level files in skill dirs
+      - name: Check structure
         run: |
-          for skill in ${{ steps.find.outputs.skills }}; do
+          while IFS= read -r skill; do
+            [ -z "$skill" ] && continue
             name=$(basename "$skill")
-            # Only SKILL.md, scripts/, references/, assets/, package.json allowed at top level
             extra=$(ls "$skill" | grep -v -E '^(SKILL\.md|scripts|references|assets|package\.json)$')
             if [ -n "$extra" ]; then
-              echo "::warning::$name: unexpected top-level files: $extra"
+              echo "::warning::$name: unexpected files: $extra"
             fi
-          done
+          done <<< "${{ steps.find.outputs.skills }}"
           echo "✅ Structure check complete"
 
       - name: Summary
@@ -135,7 +134,8 @@ jobs:
           echo "## Skill Validation Summary" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           echo "**${{ steps.find.outputs.count }}** skills validated" >> "$GITHUB_STEP_SUMMARY"
-          for skill in ${{ steps.find.outputs.skills }}; do
+          while IFS= read -r skill; do
+            [ -z "$skill" ] && continue
             name=$(basename "$skill")
             echo "- ✅ \`$name\`" >> "$GITHUB_STEP_SUMMARY"
-          done
+          done <<< "${{ steps.find.outputs.skills }}"
