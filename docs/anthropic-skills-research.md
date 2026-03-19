@@ -1,194 +1,99 @@
-# Anthropic Skills Research — Findings & Action Items
+# Anthropic Skills Research — OpenClaw-First Lens
 
-> Research done 2026-03-19 after Anthropic published `anthropics/skills` repo and the Agent Skills spec at agentskills.io.
+> Research done 2026-03-19. Chris's skills are built for OpenClaw. Anthropic's work is reference material, not the target platform.
 
-## What Anthropic Shipped
+## What Anthropic Did (Reference)
 
-Anthropic published an official **skills repository** (`anthropics/skills` on GitHub) with:
-- The **Agent Skills specification** (now at agentskills.io/specification)
-- A **skill-creator plugin** with evals, benchmarking, and trigger optimization
-- 18 example skills covering creative, technical, enterprise, and document tasks
-- Document skills (docx, pdf, pptx, xlsx) powering Claude's built-in file capabilities
+Anthropic published `anthropics/skills` repo, the Agent Skills spec (agentskills.io), a skill-creator plugin with evals/benchmarking, and 18 example skills. Their blog covers progressive disclosure architecture, code execution in VMs, and security practices.
 
-### Engineering Blog: "Equipping agents for the real world with Agent Skills"
+**Key takeaway:** The spec format (SKILL.md + frontmatter) is the same standard OpenClaw follows. But the runtime, loading, gating, and distribution are completely different.
 
-Key architecture insights from the blog post:
+## OpenClaw Skills vs Anthropic Skills — Key Differences
 
-**Progressive disclosure is the core design principle.** Three levels:
-1. **Metadata** (~100 tokens) — name + description loaded at startup in system prompt
-2. **Instructions** (<5k tokens) — full SKILL.md loaded when skill triggers (via bash read)
-3. **Resources** (unlimited) — scripts, references, assets loaded on demand
+| Aspect | Anthropic (Claude Code) | OpenClaw |
+|--------|------------------------|----------|
+| Loading | Agent reads SKILL.md via bash on trigger | Gateway pre-indexes, injects `<available_skills>` XML into system prompt at session start |
+| Discovery | Plugin marketplace, `/plugin install` | ClawHub (`clawhub install`), bundled, managed (`~/.openclaw/skills`), workspace (`<workspace>/skills/`) |
+| Gating | None (all installed skills always available) | Rich: `requires.bins`, `requires.env`, `requires.config`, `metadata.openclaw.os`, `enabled` flag |
+| Config | N/A | Per-skill env injection, API keys, custom config in `openclaw.json` |
+| Metadata | `name`, `description`, `license`, `metadata`, `compatibility`, `allowed-tools` | Same base fields + OpenClaw extensions: `metadata.openclaw.requires`, `metadata.openclaw.install`, `metadata.openclaw.emoji`, `metadata.openclaw.homepage`, `metadata.openclaw.os`, `user-invocable`, `disable-model-invocation`, `command-dispatch`, `homepage` |
+| Precedence | Last installed wins | Workspace > managed (`~/.openclaw/skills`) > bundled > extraDirs |
+| Token cost | ~100 tokens/skill at metadata level | ~24 tokens base + field lengths per skill (XML format) |
+| Hot reload | Restart Claude Code | Skills watcher auto-refreshes on SKILL.md changes |
+| Remote nodes | N/A | macOS nodes can make platform-specific skills available to Linux gateways |
+| Scripts | Agent runs via bash in VM | Agent runs via exec tool (respects sandboxing, elevated permissions) |
+| Frontmatter format | Standard YAML | Single-line keys only, `metadata` must be single-line JSON object |
 
-**Skills run in Claude's VM/code execution environment.** Claude reads SKILL.md via bash, then optionally reads referenced files or runs scripts. Script code never enters context — only output does. This means skills can bundle unlimited reference material with zero context penalty until accessed.
+## What We Can Learn (OpenClaw-Specific)
 
-**Code execution is the differentiator.** Scripts provide deterministic reliability that token generation can't match. Sorting, form filling, PDF extraction — all better as code than as LLM output.
+### 1. Description quality matters more than we think
 
-**Best practices from Anthropic:**
-- Start with evaluation — identify capability gaps by running agents on representative tasks, then build skills to address shortcomings
-- Structure for scale — split SKILL.md when unwieldy, keep mutually exclusive contexts on separate paths
-- Think from Claude's perspective — monitor how Claude uses skills in real scenarios, iterate on name/description which drive triggering
-- Iterate with Claude — ask it to capture successful approaches and mistakes into reusable skill content
+Anthropic found Claude **undertriggers** skills. OpenClaw has the same problem — the model sees `<available_skills>` XML and has to decide which skill matches. Our descriptions need to be explicit about:
+- What the skill does
+- When to use it (specific trigger phrases/contexts)
+- What it does NOT do (avoid false triggers)
 
-**Security:** Install only from trusted sources. Audit scripts and instructions for exfiltration or external network connections. Skills provide new capabilities through both instructions and code.
+**Action:** Audit all 11 skill descriptions. Make them "pushy" — include every context where the skill should fire. Example: instead of "Manage Apple Notes via memo CLI", write "Manage Apple Notes via memo CLI. Use when the user asks to add a note, list notes, search notes, or manage note folders. Also use for any mention of Apple Notes, macOS notes, or memo CLI."
 
-**Future direction:** Agents creating/editing/evaluating skills on their own. Skills complementing MCP servers. Plugin marketplace for discovery and sharing.
+### 2. Progressive disclosure is already working for us
 
-### Platform Docs & Cookbook
+OpenClaw loads only metadata (~24 tokens/skill) at session start. The agent reads SKILL.md body only when it decides the skill is relevant. This is the same three-level model Anthropic describes. We're already doing this right.
 
-**Claude API supports skills via the `container` parameter:**
-```python
-response = client.beta.messages.create(
-    model="claude-sonnet-4-6",
-    container={"skills": [{"type": "anthropic", "skill_id": "xlsx", "version": "latest"}]},
-    tools=[{"type": "code_execution_20250825", "name": "code_execution"}],
-    betas=["code-execution-2025-08-25", "files-api-2025-04-14", "skills-2025-10-02"],
-)
-```
+**Action:** Ensure no SKILL.md exceeds 500 lines. We already enforced this during dotfiles migration but haven't checked the 11 top-level skills.
 
-Three beta headers required: `code-execution-2025-08-25`, `skills-2025-10-02`, `files-api-2025-04-14`.
+### 3. Evals are the gap — but adapted for OpenClaw
 
-**Token efficiency:** Skills cost ~100 tokens per skill at metadata level vs 5k-10k tokens for equivalent manual instructions. The 98% savings applies to initial context — once triggered, full instructions load (~5k tokens).
+Anthropic's eval system spawns parallel `claude -p` agents with/without skills and grades outputs. For OpenClaw, we'd use `sessions_spawn` with the skill enabled/disabled. The eval framework concept is sound, but the execution layer is different.
 
-**Custom skills work identically** — create locally, upload via API, or add in claude.ai settings. Same progressive disclosure, same loading model.
+**Action:** Build an OpenClaw-native eval runner that:
+- Takes a skill + test cases (evals.json)
+- Spawns parallel sub-agents via `sessions_spawn` with the skill in context
+- Spawns baseline sub-agents without the skill
+- Grades outputs against assertions
+- Reports pass rate, token usage, latency
 
-### Official Validation Tool: `skills-ref`
+### 4. Trigger optimization
 
-Python CLI from `agentskills/agentskills` repo:
-- Validates frontmatter fields (only `name`, `description`, `license`, `allowed-tools`, `metadata`, `compatibility` allowed)
-- Checks name format (lowercase, alphanumeric + hyphens, max 64 chars, matches directory name)
-- Checks description length (max 1024 chars)
-- Checks compatibility length (max 500 chars)
-- NFKC Unicode normalization on names
-- Pytest test suite included
+Anthropic's `improve_description.py` rewrites descriptions based on eval results. Same principle applies — if a skill triggers 50% of the time, we're leaving value on the table. The description is the only thing the model sees at decision time.
 
-Install: `pip install` from the repo's `skills-ref/` directory.
+**Action:** After evals exist, build a trigger test that sends ambiguous prompts and measures whether the agent loads the right skill.
 
-### The Agent Skills Spec
+### 5. Validation — use `skills-ref` but add OpenClaw checks
 
-The spec defines a standard format any agent can implement:
+The official `skills-ref` validator checks spec compliance (name format, description length, frontmatter fields). But it doesn't know about OpenClaw's extensions:
+- `metadata.openclaw.requires.*` (gating)
+- `metadata.openclaw.install` (installer specs)
+- `user-invocable`, `disable-model-invocation`, `command-dispatch` (slash commands)
+- Single-line JSON constraint on metadata
 
-**Required:** `SKILL.md` with YAML frontmatter (`name` + `description`) and Markdown instructions.
+**Action:** Extend our CI to run `skills-ref validate` for base spec compliance + our own checks for OpenClaw-specific fields.
 
-**Optional directories:** `scripts/` (executable code), `references/` (docs loaded on demand), `assets/` (templates/resources).
+### 6. The spec is converging — but OpenClaw has extensions
 
-**Key constraints:**
-- `name`: 1-64 chars, lowercase alphanumeric + hyphens, no consecutive hyphens, must match directory name
-- `description`: 1-1024 chars, should include both what it does AND when to use it
-- `SKILL.md` body: recommended <500 lines
-- Progressive disclosure: metadata (~100 tokens) → instructions (<5k tokens) → resources (on demand)
+OpenClaw follows the AgentSkills spec for layout and intent. The `skills-ref` validator's allowed fields are: `name`, `description`, `license`, `allowed-tools`, `metadata`, `compatibility`. OpenClaw adds: `homepage`, `user-invocable`, `disable-model-invocation`, `command-dispatch`, `command-tool`, `command-arg-mode`. These extensions are fine — the spec's `metadata` field is intentionally extensible — but we should document them clearly.
 
-**Validation tool:** `skills-ref` CLI from `agentskills/agentskills` repo.
+## Revised Action Plan (OpenClaw-First)
 
-### The skill-creator Plugin (The Big One)
+### Phase 1: Quality (quick wins)
+1. **Description audit** — rewrite all 11 descriptions to be trigger-explicit
+2. **Line count audit** — verify all SKILL.md files are under 500 lines
+3. **CI: add `skills-ref validate`** alongside our existing checks
+4. **Document OpenClaw extensions** in the repo README
 
-Anthropic's skill-creator is a full development environment, not just a template generator:
+### Phase 2: Testing
+5. **Build evals.json for each skill** — 3-5 test cases per skill
+6. **Build OpenClaw eval runner** — `sessions_spawn` based A/B testing
+7. **Add eval results to CI** — not just "does it parse?" but "does it improve output?"
 
-**485-line SKILL.md** with:
-- Intent capture from conversation history
-- User interview workflow
-- Progressive disclosure architecture guidance
-- Domain organization patterns
-- Writing style guidelines
+### Phase 3: Distribution
+8. **ClawHub sync** — ensure all 11 skills are publishable via `clawhub`
+9. **Trigger optimization** — automated description improvement based on eval data
 
-**8 Python scripts** in `scripts/`:
-| Script | Purpose |
-|--------|---------|
-| `run_eval.py` | Run skill vs baseline, spawn parallel agents |
-| `aggregate_benchmark.py` | Compile A/B results with variance analysis |
-| `generate_report.py` | HTML report with side-by-side comparisons |
-| `improve_description.py` | Optimize trigger descriptions via Claude Code |
-| `quick_validate.py` | Fast SKILL.md validation |
-| `package_skill.py` | Bundle for distribution |
-| `run_loop.py` | Iterative improvement loop |
-| `utils.py` | Shared helpers |
-
-**3 agent templates** for subagents:
-- `analyzer.md` — qualitative analysis of outputs
-- `comparator.md` — side-by-side comparison
-- `grader.md` — quantitative assertion grading
-
-**Eval viewer** — generates HTML with side-by-side skill vs baseline comparisons.
-
-### Key Insight: Evals Change Everything
-
-The skill-creator's eval system runs **parallel A/B benchmarks**:
-1. Generate test cases (evals.json)
-2. Spawn N agents WITH skill + N agents WITHOUT skill (baseline)
-3. Grade against assertions (pass/fail criteria)
-4. Compile metrics: pass rate, token usage, latency
-5. Generate HTML review playground
-6. Iterate: fix gaps, re-benchmark
-
-Real example from the wild: WordPress security review skill went from 90.5% → 100% pass rate after one eval iteration. Baseline Claude missed WooCommerce-specific patterns that the skill caught.
-
-### Trigger Optimization
-
-The `improve_description.py` script specifically optimizes the `description` field for better triggering. This matters because Claude has a documented tendency to **undertrigger** skills. Anthropic recommends making descriptions "a little bit pushy" — including every possible context where the skill should fire.
-
-### Plugin Marketplace Integration
-
-Skills can be distributed via Claude Code's plugin system:
-```
-/plugin marketplace add anthropics/skills
-/plugin install document-skills@anthropic-agent-skills
-```
-
-## How We Compare
-
-| Feature | Anthropic skill-creator | Our skill-publisher |
-|---------|------------------------|-------------------|
-| SKILL.md generation | ✅ Full interview workflow | ✅ Basic |
-| Evals & benchmarks | ✅ A/B parallel, graded assertions | ❌ None |
-| Trigger optimization | ✅ Automated description improvement | ❌ None |
-| Validation | ✅ quick_validate.py + skills-ref | ✅ CI workflow |
-| Packaging | ✅ package_skill.py | ❌ None |
-| Iterative loop | ✅ run_loop.py | ❌ None |
-| HTML review viewer | ✅ eval-viewer/ | ❌ None |
-| Spec compliance | ✅ IS the spec | ✅ Compatible |
-| Claude Code native | ✅ /plugin install | ❌ Manual copy |
-| Multi-agent support | ✅ 3 agent templates | ❌ None |
-| Progressive disclosure | ✅ Explicit guidance | ⚠️ Basic |
-
-## What We Should Do
-
-### Immediate (copy the good parts)
-
-1. **Port the eval system** — The biggest gap. Our skills have zero testing. Port `run_eval.py`, `aggregate_benchmark.py`, and `grader.md` agent. Adapt for OpenClaw (use `sessions_spawn` instead of `claude -p`).
-
-2. **Add trigger optimization** — Port `improve_description.py`. Even a simplified version that rewrites descriptions based on test results would help. OpenClaw's `available_skills` list shows descriptions to the model at startup, so this matters.
-
-3. **Use `skills-ref validate`** — Switch from our custom CI to the official validator. Add it as a Makefile target.
-
-4. **Merge skill-creator into skill-publisher** — Our skill-publisher (98 lines) is a subset of what Anthropic's skill-creator does. Either port Anthropic's version or clearly differentiate (ours = distribution, theirs = development).
-
-### Short-term
-
-5. **Add evals.json to each skill** — Even 3-5 test cases per skill. The eval framework needs test data to be useful.
-
-6. **Progressive disclosure audit** — Check all 11 skills against the <500 line recommendation. We already did this for the dotfiles skills but haven't verified the rest.
-
-7. **Description pushiness audit** — Anthropic explicitly says Claude undertriggers skills. Review all 11 descriptions and make them more aggressive about when to fire.
-
-### Medium-term
-
-8. **OpenClaw plugin compatibility** — Investigate if OpenClaw can register as a plugin marketplace. The `/plugin install` flow would be ideal for our mono-repo.
-
-9. **Cross-agent evals** — Anthropic's evals only test against Claude Code. We could benchmark skills across Claude Code, Codex, Gemini CLI, and OpenCode — since our skills claim to be agent-agnostic.
-
-10. **CI eval pipeline** — Add eval runs to the GitHub Actions workflow. Not just "does SKILL.md parse?" but "does the skill actually improve output?"
-
-## Things We're Already Doing Right
-
-- ✅ Spec-compliant SKILL.md format with proper frontmatter
-- ✅ Progressive disclosure with references/ and scripts/
-- ✅ CI validation on every push
-- ✅ Mono-repo structure (Anthropic does the same thing)
-- ✅ Line count compliance (we enforced this during migration)
-- ✅ skill-creator built-in skill for OpenClaw agents
-
-## Files Referenced
-
+## Sources
 - Anthropic skills repo: https://github.com/anthropics/skills
 - Agent Skills spec: https://agentskills.io/specification
-- Validation tool: https://github.com/agentskills/agentskills
-- Anthropic blog post: https://anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills
+- Anthropic blog: https://claude.com/blog/equipping-agents-for-the-real-world-with-agent-skills
+- Platform docs: https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
+- skills-ref validator: https://github.com/agentskills/agentskills
+- OpenClaw skills docs: ~/openclaw/docs/tools/skills.md
+- OpenClaw creating-skills docs: ~/openclaw/docs/tools/creating-skills.md
