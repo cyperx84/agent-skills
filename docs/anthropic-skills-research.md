@@ -10,6 +10,59 @@ Anthropic published an official **skills repository** (`anthropics/skills` on Gi
 - 18 example skills covering creative, technical, enterprise, and document tasks
 - Document skills (docx, pdf, pptx, xlsx) powering Claude's built-in file capabilities
 
+### Engineering Blog: "Equipping agents for the real world with Agent Skills"
+
+Key architecture insights from the blog post:
+
+**Progressive disclosure is the core design principle.** Three levels:
+1. **Metadata** (~100 tokens) — name + description loaded at startup in system prompt
+2. **Instructions** (<5k tokens) — full SKILL.md loaded when skill triggers (via bash read)
+3. **Resources** (unlimited) — scripts, references, assets loaded on demand
+
+**Skills run in Claude's VM/code execution environment.** Claude reads SKILL.md via bash, then optionally reads referenced files or runs scripts. Script code never enters context — only output does. This means skills can bundle unlimited reference material with zero context penalty until accessed.
+
+**Code execution is the differentiator.** Scripts provide deterministic reliability that token generation can't match. Sorting, form filling, PDF extraction — all better as code than as LLM output.
+
+**Best practices from Anthropic:**
+- Start with evaluation — identify capability gaps by running agents on representative tasks, then build skills to address shortcomings
+- Structure for scale — split SKILL.md when unwieldy, keep mutually exclusive contexts on separate paths
+- Think from Claude's perspective — monitor how Claude uses skills in real scenarios, iterate on name/description which drive triggering
+- Iterate with Claude — ask it to capture successful approaches and mistakes into reusable skill content
+
+**Security:** Install only from trusted sources. Audit scripts and instructions for exfiltration or external network connections. Skills provide new capabilities through both instructions and code.
+
+**Future direction:** Agents creating/editing/evaluating skills on their own. Skills complementing MCP servers. Plugin marketplace for discovery and sharing.
+
+### Platform Docs & Cookbook
+
+**Claude API supports skills via the `container` parameter:**
+```python
+response = client.beta.messages.create(
+    model="claude-sonnet-4-6",
+    container={"skills": [{"type": "anthropic", "skill_id": "xlsx", "version": "latest"}]},
+    tools=[{"type": "code_execution_20250825", "name": "code_execution"}],
+    betas=["code-execution-2025-08-25", "files-api-2025-04-14", "skills-2025-10-02"],
+)
+```
+
+Three beta headers required: `code-execution-2025-08-25`, `skills-2025-10-02`, `files-api-2025-04-14`.
+
+**Token efficiency:** Skills cost ~100 tokens per skill at metadata level vs 5k-10k tokens for equivalent manual instructions. The 98% savings applies to initial context — once triggered, full instructions load (~5k tokens).
+
+**Custom skills work identically** — create locally, upload via API, or add in claude.ai settings. Same progressive disclosure, same loading model.
+
+### Official Validation Tool: `skills-ref`
+
+Python CLI from `agentskills/agentskills` repo:
+- Validates frontmatter fields (only `name`, `description`, `license`, `allowed-tools`, `metadata`, `compatibility` allowed)
+- Checks name format (lowercase, alphanumeric + hyphens, max 64 chars, matches directory name)
+- Checks description length (max 1024 chars)
+- Checks compatibility length (max 500 chars)
+- NFKC Unicode normalization on names
+- Pytest test suite included
+
+Install: `pip install` from the repo's `skills-ref/` directory.
+
 ### The Agent Skills Spec
 
 The spec defines a standard format any agent can implement:
