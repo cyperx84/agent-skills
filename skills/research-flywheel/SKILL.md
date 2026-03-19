@@ -1,6 +1,6 @@
 ---
 name: research-flywheel
-description: Mine conversations for research-worthy topics, deep research them via deep-research skill, store findings, and report digests. A research flywheel that closes the loop between conversations and knowledge.
+description: "Mine conversations for research-worthy topics using LCM search, deep research them via deep-research skill, store findings, and report digests. Closes the loop between conversations and knowledge. Use when the user says 'research flywheel', 'mine conversations', 'find research topics', 'what should we research', or wants to surface insights from past sessions."
 license: MIT
 allowed-tools:
   - lcm_grep
@@ -13,8 +13,7 @@ allowed-tools:
   - exec
   - message
 metadata:
-  author: cyperx84
-  version: 0.1.0
+  { "author": "cyperx84", "version": "0.1.0" }
 ---
 
 # Research Flywheel

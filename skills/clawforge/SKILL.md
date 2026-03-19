@@ -2,11 +2,7 @@
 name: clawforge
 description: "Forge and manage fleets of OpenClaw agents. Use when: (1) creating/listing/inspecting agents (create, list, inspect), (2) managing agent lifecycle (bind, activate, deactivate, destroy, deploy), (3) sharing agents (export, import), (4) fleet observability (status, cost, logs, health), (5) fleet sync and drift detection, (6) comparing agents (diff). NOT for: editing individual agent files (use read/edit tools directly)."
 metadata:
-  openclaw:
-    emoji: "🔨"
-    requires:
-      bins:
-        - clawforge
+  { "openclaw": { "emoji": "🔨", "requires": { "bins": ["clawforge"] } } }
 ---
 
 # ClawForge v3.1 — Fleet Forge for OpenClaw

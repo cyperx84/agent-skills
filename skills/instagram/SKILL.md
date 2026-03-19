@@ -1,6 +1,6 @@
 ---
 name: instagram
-description: Control Instagram via the instagram-cli tool — browse feed, DMs, stories, post content, manage multiple accounts.
+description: "Control Instagram via instagram-cli — browse feed, send/read DMs, view and post stories, upload content, manage multiple accounts. Use when the user mentions Instagram, asks to check/post DMs, view stories, upload a photo/reel, or manage Instagram accounts."
 metadata:
   { "openclaw": { "emoji": "📸", "os": ["darwin", "linux"], "requires": { "bins": ["instagram-cli"] } } }
 ---

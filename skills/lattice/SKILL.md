@@ -2,10 +2,7 @@
 name: lattice
 description: "Apply mental models and cognitive frameworks to problems, decisions, and content analysis. Use when the user asks to 'think through' a problem, says 'apply mental models', mentions specific models like inversion/second-order thinking/bottlenecks/first principles, needs structured decision analysis, wants to understand cognitive biases at play, or asks 'what framework should I use'."
 metadata:
-  openclaw:
-    emoji: "🧠"
-    requires:
-      bins: ["lattice"]
+  { "openclaw": { "emoji": "🧠", "requires": { "bins": ["lattice"] } } }
 ---
 
 # Lattice — Mental Models Engine

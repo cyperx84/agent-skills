@@ -1,16 +1,9 @@
 ---
 name: deep-research
-description: >
-  Recursive breadth/depth research skill. Spawns parallel worker sub-agents
-  to search, scrape, and extract findings iteratively, then synthesizes a
-  final report. OpenClaw-native: no external APIs beyond web_search/web_fetch.
-  Triggers: "research [topic]", "deep research", "do a deep dive", "investigate".
+description: "Recursive breadth/depth research using parallel sub-agents. Spawns workers to search, scrape, and extract findings iteratively, then synthesizes a final report. OpenClaw-native (web_search/web_fetch only, no external APIs). Use when the user says 'research [topic]', 'deep research', 'deep dive', 'investigate', 'look into', 'find out about', or wants thorough multi-source research on any topic. NOT for quick single-query lookups."
 license: MIT
 metadata:
-  author: cyperx
-  version: "1.0.0"
-  openclaw: true
-  categories: [research, productivity]
+  { "author": "cyperx", "version": "1.0.0", "openclaw": true, "categories": ["research", "productivity"] }
 ---
 
 # deep-research

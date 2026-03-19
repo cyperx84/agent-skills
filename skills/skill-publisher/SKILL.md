@@ -1,16 +1,9 @@
 ---
 name: skill-publisher
-description: >
-  The meta-skill that publishes skills. Validates a skill's structure and
-  frontmatter, copies it into the mono-repo, generates PRs for awesome-lists,
-  prepares social posts, and publishes to ClawHub. Triggers: "publish a skill",
-  "ship this skill", "distribute skill", "skill-publisher validate/publish".
+description: "Validate, publish, and distribute OpenClaw skills to the agent-skills mono-repo and ClawHub. Checks SKILL.md structure, frontmatter compliance, and line counts. Use when the user says 'publish a skill', 'ship this skill', 'validate a skill', 'distribute skill', 'add skill to repo', or mentions skill-publisher."
 license: MIT
 metadata:
-  author: cyperx
-  version: "1.0.0"
-  openclaw: true
-  categories: [dev, productivity]
+  { "author": "cyperx", "version": "1.0.0", "openclaw": true, "categories": ["dev", "productivity"] }
 ---
 
 # skill-publisher

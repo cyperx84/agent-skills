@@ -2,11 +2,7 @@
 name: multiplan
 description: "Run multi-model parallel planning workflows using the multiplan CLI. Sends a task simultaneously to Claude (correctness lens), Gemini (scale lens), Codex (speed lens), and GLM-5 (critic lens), cross-examines the results, then converges on a weighted final plan. Use when the user asks to: plan something with multiple models, run a multiplan, get a stress-tested technical plan, use multiplan on a task, plan with all models, or run parallel planning. NOT for simple one-model plans — use this when the user explicitly wants multi-model or multiplan."
 metadata:
-  openclaw:
-    emoji: "🧠"
-    requires:
-      bins:
-        - multiplan
+  { "openclaw": { "emoji": "🧠", "requires": { "bins": ["multiplan"] } } }
 ---
 
 # multiplan
