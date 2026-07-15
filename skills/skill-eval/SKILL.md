@@ -87,7 +87,8 @@ Deterministic, no LLM calls inside the CLI. Roster = merged `~/.agents/skills` +
 ```
 skilleval lint <skill>      structural checks (frontmatter, name/dir match, length)
 skilleval scan <skill>      injection / overbroad-trigger pattern scan, exit-gates
-skilleval contend <skill>   hijack rate (steals others' queries) + shadow rate (loses its own)
+skilleval contend <skill>   shadow rate (loses its own queries) + hijack rate (steals
+                            others') + worst-victim rate (destroys one specific skill)
 skilleval roster            roster-wide shadow-rate matrix — catches collisions on install
 skilleval judge <skill>     prints delegation instructions for the LLM rubric pass above
 skilleval all <skill>       lint -> scan -> contend -> judge, gates on fail
@@ -105,3 +106,8 @@ router can never trigger them) and name collisions (one file wins, the other is 
 own description, so `shadow_rate` is biased low. A hit is strong evidence of a real
 collision; a zero is weak evidence of safety. TF-IDF catches vocabulary overlap, not
 semantic overlap. Use `--queries` with held-out sets for the stronger claim.
+
+Gate on `worst_victim_rate` (> 0.3), not `hijack_rate` (> 0.15), when vetting one
+candidate: `hijack_rate` divides by the whole roster's queries, so it fades as the roster
+grows. `worst_victim_rate` is the worst single victim's loss and names the victim.
+Exit codes: 0 clean, 1 a gate failed, 2 unscorable (never read 2 as a pass).
