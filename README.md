@@ -11,6 +11,7 @@ Works with any [AgentSkills](https://agentskills.io) compatible agent: Claude Co
 | Skill | Description |
 |-------|-------------|
 | [skill-publisher](skills/skill-publisher/) | Meta-skill: validate, publish, and distribute skills |
+| [skill-eval](skills/skill-eval/) | Score a skill against the spec, and against your real roster — does it steal triggers from skills you already have? |
 | [deep-research](skills/deep-research/) | Recursive breadth/depth research with parallel sub-agents |
 | [research-spinoff](skills/research-spinoff/) | Research spin-off product ideas from an existing project |
 | [research-flywheel](skills/research-flywheel/) | Mine conversations for research topics, deep research them, and produce digests |
