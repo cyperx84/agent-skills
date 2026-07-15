@@ -17,6 +17,7 @@ Works with any [AgentSkills](https://agentskills.io) compatible agent: Claude Co
 | [research-flywheel](skills/research-flywheel/) | Mine conversations for research topics, deep research them, and produce digests |
 | [multiplan](skills/multiplan/) | 4-model parallel planning workflow (Claude, Gemini, Codex, GLM-5) |
 | [content-breakdown](skills/content-breakdown/) | Turn articles, videos, and docs into structured findings and notes |
+| [talk-once](skills/talk-once/) | Turn one interview into a canonical article and reviewed channel drafts |
 | [clawforge](skills/clawforge/) | Agent swarm workflow — spawn, monitor, review, and manage coding agents |
 
 ### Productivity
