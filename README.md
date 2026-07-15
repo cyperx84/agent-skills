@@ -19,6 +19,8 @@ Works with any [AgentSkills](https://agentskills.io) compatible agent: Claude Co
 | [talk-once](skills/talk-once/) | Turn one interview into a canonical article and reviewed channel drafts |
 | [clawforge](skills/clawforge/) | Agent swarm workflow — spawn, monitor, review, and manage coding agents |
 | [clwatch](skills/clwatch/) | Changelog tracking CLI and skill — currently being rebuilt |
+| [soul-forge](skills/soul-forge/) | Interview a user and generate durable agent identity and context files |
+| [ascii-animations](skills/ascii-animations/) | Design accessible terminal animations for CLI and TUI applications |
 
 ### Productivity
 
