@@ -8,7 +8,7 @@ Experiments stay out, even when they happen to contain a skill file.
 | Project | Decision |
 | --- | --- |
 | `talk-once` | Core publishing workflow. Fold in the useful transcription and site-adapter ideas from VoicePipe. |
-| `voice-forge` | Core voice corpus and portable style-profile provider. Expand its toolbox skill beyond TTS. |
+| `voice-forge` | Core voice corpus and portable style-profile provider; its full portable workflow is now in the toolbox. |
 | `soul-forge` | Keep standalone; its portable onboarding skill is now in the toolbox. |
 | `ascii-animations` | Keep standalone; its portable terminal-animation skill is now in the toolbox. |
 | `clwatch` + `changelogs-info` | Keep both. Rebuild the CLI, skill, and website as one coherent changelog product; use a safe toolbox stub during reconstruction. |
