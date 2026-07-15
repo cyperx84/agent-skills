@@ -1,62 +1,24 @@
 ---
 name: clwatch
-description: Track AI coding agent changelog updates (Claude Code, Codex, Gemini CLI, OpenCode) using the clwatch CLI. Use when the user asks to check for updates to coding tools, view changelogs, see what changed between versions, or monitor AI coding tool releases. NOT for managing OpenClaw itself (use gateway tools for that).
-metadata: { "openclaw": { "emoji": "👁️", "requires": { "bins": ["clwatch"] } } }
+description: Work with the CLWatch changelog-tracking CLI when the user asks to inspect AI coding-tool releases, compare changelog versions, or check what changed. CLWatch and changelogs.info are currently being rebuilt, so discover the installed command surface before use and do not assume legacy commands or APIs still exist.
 ---
 
-# clwatch — AI Coding Tool Changelog Tracker
+# CLWatch
 
-Track updates across Claude Code, Codex, Gemini CLI, and OpenCode via changelogs.info.
+Treat CLWatch as an active product under reconstruction. Preserve the skill name
+while the CLI and changelogs.info website are redesigned together.
 
-**Binary:** `clwatch` (`/opt/homebrew/bin/clwatch`)
-**Install:** `brew install cyperx84/tap/clwatch`
+## Safe workflow
 
-## Quick Reference
+1. Check whether `clwatch` is installed.
+2. Run `clwatch --help` and, when relevant, the selected subcommand's `--help`.
+3. Use only commands and flags shown by the installed binary.
+4. Prefer structured output when the current CLI advertises it.
+5. Report the installed version and the exact command used with any result.
 
-```bash
-# See what's changed since last check
-clwatch diff
+If the binary is unavailable or the requested capability is absent, say that
+CLWatch is being rebuilt. Do not install an old release, call an undocumented
+changelogs.info endpoint, or reconstruct the legacy interface from memory.
 
-# List all tracked tools
-clwatch list
-
-# Refresh a specific tool's changelog
-clwatch refresh claude-code
-
-# Watch for updates on an interval
-clwatch watch --interval 6h
-
-# Get status of all tools
-clwatch status
-
-# See diff between two versions
-clwatch diff-tool claude-code v1.0.0 v1.1.0
-
-# Acknowledge (mark as seen) a version
-clwatch ack claude-code v1.1.0
-
-# Init tracking in a directory
-clwatch init
-
-# JSON output for any command
-clwatch diff --json
-clwatch status --json
-```
-
-## How to Use
-
-When the user asks about updates to coding tools, AI agent releases, or changelogs:
-
-1. Run `clwatch diff` to see unacknowledged changes
-2. Run `clwatch status` for a full overview
-3. Use `clwatch refresh <tool>` to force-fetch latest
-4. Use `clwatch diff-tool <tool> <from> <to>` for specific version diffs
-
-## Tracked Tools
-
-- Claude Code
-- Codex (OpenAI)
-- Gemini CLI
-- OpenCode
-
-Data sourced from changelogs.info API.
+For release facts that must be answered now, consult the tools' official
+changelogs directly and label that result as outside CLWatch.

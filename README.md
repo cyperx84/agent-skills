@@ -12,12 +12,13 @@ Works with any [AgentSkills](https://agentskills.io) compatible agent: Claude Co
 |-------|-------------|
 | [skill-publisher](skills/skill-publisher/) | Meta-skill: validate, publish, and distribute skills |
 | [deep-research](skills/deep-research/) | Recursive breadth/depth research with parallel sub-agents |
-| [clwatch](skills/clwatch/) | Detect coding tool updates and merge changelog deltas at session start |
 | [research-spinoff](skills/research-spinoff/) | Research spin-off product ideas from an existing project |
 | [research-flywheel](skills/research-flywheel/) | Mine conversations for research topics, deep research them, and produce digests |
 | [multiplan](skills/multiplan/) | 4-model parallel planning workflow (Claude, Gemini, Codex, GLM-5) |
 | [content-breakdown](skills/content-breakdown/) | Turn articles, videos, and docs into structured findings and notes |
+| [talk-once](skills/talk-once/) | Turn one interview into a canonical article and reviewed channel drafts |
 | [clawforge](skills/clawforge/) | Agent swarm workflow — spawn, monitor, review, and manage coding agents |
+| [clwatch](skills/clwatch/) | Changelog tracking CLI and skill — currently being rebuilt |
 
 ### Productivity
 
@@ -52,6 +53,9 @@ bash skills/skill-publisher/scripts/validate-skill.sh path/to/your-skill
 # 2. Add to mono-repo and push
 git add skills/your-skill && git commit -m "Add your-skill" && git push
 ```
+
+See [the toolbox inventory](docs/toolbox-inventory.md) for the candidate queue,
+overlap decisions, and import order.
 
 ## Skill Standard
 
