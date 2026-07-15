@@ -98,7 +98,6 @@ User wants to browse → `lattice list` or `lattice list --category "Human Natur
 Lattice works standalone and also integrates with:
 - **multiplan** — auto-injects Phase 0 mental model framing before parallel planning
 - **content-breakdown** — `--think` flag appends model analysis; `mental-models` lens available
-- **clwatch** — `clwatch think <harness>` tags changelogs with mental models
 
 ## Output
 
