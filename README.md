@@ -21,6 +21,7 @@ Works with any [AgentSkills](https://agentskills.io) compatible agent: Claude Co
 | [clwatch](skills/clwatch/) | Changelog tracking CLI and skill — currently being rebuilt |
 | [soul-forge](skills/soul-forge/) | Interview a user and generate durable agent identity and context files |
 | [ascii-animations](skills/ascii-animations/) | Design accessible terminal animations for CLI and TUI applications |
+| [voice-forge](skills/voice-forge/) | Build and use a private, portable communication style profile |
 
 ### Productivity
 
