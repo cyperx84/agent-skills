@@ -11,6 +11,7 @@ Experiments stay out, even when they happen to contain a skill file.
 | `voice-forge` | Core voice corpus and portable style-profile provider. Expand its toolbox skill beyond TTS. |
 | `soul-forge` | Keep standalone and add its mature onboarding skill to the toolbox. |
 | `ascii-animations` | Keep standalone and add its reusable skill to the toolbox. |
+| `clwatch` + `changelogs-info` | Keep both. Rebuild the CLI, skill, and website as one coherent changelog product; use a safe toolbox stub during reconstruction. |
 | `clawrus` | Keep the distributed fleet-orchestration idea, then rename and simplify it around a Chorus concept. |
 | `claude-skills-mental-models` + `lattice` | Preserve the starred repository, rename it, simplify it, and reconcile Lattice into one canonical mental-model product. |
 
@@ -21,7 +22,6 @@ Experiments stay out, even when they happen to contain a skill file.
 - `remotion-claw`: abandoned experiment; repository deletion requested.
 - `gen-podcast`: abandoned experiment; repository deletion requested.
 - `fleet-status`: abandoned experiment; repository deletion requested.
-- `clwatch`: remove the toolbox skill and retire its repositories and Homebrew formula.
 - `tts-toolkit`: experiment, but currently a VoiceForge backend dependency; remove that dependency before deletion.
 - `vault-hub-neovim`: unidentified experiment; hold for a quick code audit before deletion.
 
@@ -39,10 +39,11 @@ Experiments stay out, even when they happen to contain a skill file.
 
 ## Execution order
 
-1. Remove retired skills and repository distribution references.
+1. Remove retired experiments and their distribution references.
 2. Remove VoiceForge's TTS Toolkit dependency, then retire TTS Toolkit.
 3. Import SoulForge and ASCII Animations.
 4. Expand the VoiceForge skill and fold VoicePipe behavior into Talk Once.
 5. Rename and refactor Clawrus.
 6. Rename and simplify the mental-model repository while preserving its GitHub history.
-7. Audit the old dotfiles skills.
+7. Rebuild CLWatch and changelogs.info behind their existing public names.
+8. Audit the old dotfiles skills.

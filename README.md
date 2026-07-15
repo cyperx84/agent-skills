@@ -18,6 +18,7 @@ Works with any [AgentSkills](https://agentskills.io) compatible agent: Claude Co
 | [content-breakdown](skills/content-breakdown/) | Turn articles, videos, and docs into structured findings and notes |
 | [talk-once](skills/talk-once/) | Turn one interview into a canonical article and reviewed channel drafts |
 | [clawforge](skills/clawforge/) | Agent swarm workflow — spawn, monitor, review, and manage coding agents |
+| [clwatch](skills/clwatch/) | Changelog tracking CLI and skill — currently being rebuilt |
 
 ### Productivity
 
