@@ -54,6 +54,9 @@ bash skills/skill-publisher/scripts/validate-skill.sh path/to/your-skill
 git add skills/your-skill && git commit -m "Add your-skill" && git push
 ```
 
+See [the toolbox inventory](docs/toolbox-inventory.md) for the candidate queue,
+overlap decisions, and import order.
+
 ## Skill Standard
 
 Every skill follows the [AgentSkills spec](https://agentskills.io/specification):
