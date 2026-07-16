@@ -107,7 +107,18 @@ own description, so `shadow_rate` is biased low. A hit is strong evidence of a r
 collision; a zero is weak evidence of safety. TF-IDF catches vocabulary overlap, not
 semantic overlap. Use `--queries` with held-out sets for the stronger claim.
 
+The lexical proxy cuts both ways: cosine weights term frequency, so a skill that merely
+repeats a shared noun more often can look like it steals a neighbour's triggers with no
+semantic overlap at all. Confirm a hit reads as a real collision before acting on it.
+
 Gate on `worst_victim_rate` (> 0.3), not `hijack_rate` (> 0.15), when vetting one
 candidate: `hijack_rate` divides by the whole roster's queries, so it fades as the roster
 grows. `worst_victim_rate` is the worst single victim's loss and names the victim.
 Exit codes: 0 clean, 1 a gate failed, 2 unscorable (never read 2 as a pass).
+
+**Thin query sets report but don't gate.** A rate needs 5+ routable queries behind it to
+decide the exit code — at 3 queries the smallest non-zero rate is already over the gate,
+so one stolen query would fail on quantisation noise. Suppressed rates are still reported,
+with the reason in `advisory`; that is not a clean bill. If a skill is too terse to score,
+widen its description or pass `--queries` (hand-written sets gate at any size) rather than
+reading the pass as safety.
